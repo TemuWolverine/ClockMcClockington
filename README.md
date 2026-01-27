@@ -12,7 +12,9 @@ Since all of the smarts in my house run off Home Assistant (HA), I want this clo
 * 10k ohm resistor
 * GL5516 LDR Photoresistor
 * ClockMcClockington PCB
-  
+
+Originally I'd intended to make use of the ESP32-S2's touchpins, but they were... fiddly at best, and didn't really work well through the 3d printed shell, so I switched to using the TPP223 sensors. Everything *could* run off an ESP8266 just fine, but I'd already purchased the bulk pack of S2 Minis, so I've stuck with that. There isn't a huge price or power difference for this sort of thing.
+
 ## Software
 TODO: 
 ESPHome
