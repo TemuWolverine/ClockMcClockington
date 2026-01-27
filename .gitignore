@@ -1,2 +1,3 @@
 /circuit/Clock-backups
 *.lck
+circuit/fp-info-cache
