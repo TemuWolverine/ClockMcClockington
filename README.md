@@ -19,9 +19,14 @@ Originally I'd intended to make use of the ESP32-S2's touchpins, but they were..
 TODO: 
 ESPHome
 
+
 ## Shell
 TODO: 
 
 ## Circuit
-TODO:
-![PXL_20260126_025301969 PORTRAIT](https://github.com/user-attachments/assets/266d4dd0-680c-46d8-819b-79539a51083d)
+v1.0 This is my very first circuit design, so go easy on me!
+While it is completely functional, I didn't think to design it on a 2.54mm grid so soldering it using a breadboard to hold the pins is a little tricky. That will be an improvement for v1.1
+![](https://github.com/user-attachments/assets/5c6d79e1-64d2-4a91-ad7c-7b759cf98402)
+
+Manufactured by JLCPCB.
+![](https://github.com/user-attachments/assets/266d4dd0-680c-46d8-819b-79539a51083d)
