@@ -658,6 +658,38 @@
       {
         "netclass": "Signal",
         "pattern": "circle"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "Clock"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "CS"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "DisplaySignal"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "PhotoresistorSignal"
+      },
+      {
+        "netclass": "3v3",
+        "pattern": "-3V3"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "WS"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SCK"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SD"
       }
     ]
   },
