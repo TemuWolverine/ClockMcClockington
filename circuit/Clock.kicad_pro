@@ -489,31 +489,41 @@
         "wire_width": 6
       },
       {
-        "bus_width": 100,
+        "bus_width": 0,
         "line_style": 0,
         "name": "3v3",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 2,
+        "priority": 3,
         "schematic_color": "rgb(255, 54, 50)",
         "track_width": 1.0,
         "wire_width": 30
       },
       {
-        "bus_width": 100,
+        "bus_width": 0,
+        "line_style": 0,
+        "name": "5v",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 0,
+        "schematic_color": "rgb(255, 165, 35)",
+        "track_width": 1.0,
+        "wire_width": 30
+      },
+      {
+        "bus_width": 0,
         "line_style": 0,
         "name": "GND",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 1,
+        "priority": 2,
         "schematic_color": "rgb(101, 255, 0)",
         "track_width": 1.0,
         "wire_width": 40
       },
       {
-        "bus_width": 20,
+        "bus_width": 0,
         "line_style": 0,
         "name": "Signal",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 0,
+        "priority": 1,
         "schematic_color": "rgb(8, 61, 255)",
         "track_width": 0.4,
         "wire_width": 20
@@ -584,6 +594,70 @@
       {
         "netclass": "Signal",
         "pattern": "/DisplaySignal"
+      },
+      {
+        "netclass": "5v",
+        "pattern": "/5v"
+      },
+      {
+        "netclass": "3v3",
+        "pattern": "/MCU/3v3"
+      },
+      {
+        "netclass": "GND",
+        "pattern": "GND"
+      },
+      {
+        "netclass": "5v",
+        "pattern": "/3v3"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "/3v"
+      },
+      {
+        "netclass": "3v3",
+        "pattern": "/3v"
+      },
+      {
+        "netclass": "3v3",
+        "pattern": "+3V3"
+      },
+      {
+        "netclass": "5v",
+        "pattern": "+5V"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "/MCU/CircleButtonSignal"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "/MCU/MinusButtonSignal"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "/MCU/PlusButtonSignal"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "/MCU/TriangleButtonSignal"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "triangle"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "MinusSignal"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "PlusSignal"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "circle"
       }
     ]
   },
@@ -677,6 +751,90 @@
           "label": "#",
           "name": "${ITEM_NUMBER}",
           "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Description_1",
+          "name": "Description_1",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "MANUFACTURER",
+          "name": "MANUFACTURER",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "MAXIMUM_PACKAGE_HEIGHT",
+          "name": "MAXIMUM_PACKAGE_HEIGHT",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "MF",
+          "name": "MF",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "MP",
+          "name": "MP",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "PARTREV",
+          "name": "PARTREV",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Package",
+          "name": "Package",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Price",
+          "name": "Price",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "STANDARD",
+          "name": "STANDARD",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "SnapEDA_Link",
+          "name": "SnapEDA_Link",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "VERIFIER",
+          "name": "VERIFIER",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Availability",
+          "name": "Availability",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "CREATOR",
+          "name": "CREATOR",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Check_prices",
+          "name": "Check_prices",
+          "show": false
         }
       ],
       "filter_string": "",
@@ -714,6 +872,14 @@
       "version": 1
     },
     "net_format_name": "",
+    "ngspice": {
+      "fix_include_paths": true,
+      "meta": {
+        "version": 0
+      },
+      "model_mode": 4,
+      "workbook_filename": ""
+    },
     "page_layout_descr_file": "",
     "plot_directory": "",
     "space_save_all_events": true,
