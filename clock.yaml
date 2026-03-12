@@ -1,102 +1,23 @@
-esphome:
-  name: clockmcclockington
-  friendly_name: ClockMcClockington
-
-# Begin configuration variables
-esp32:
-  board: lolin_s2_mini
-  framework:
-    type: esp-idf
-
-# Enable logging
-logger:
-
-# Enable Home Assistant API
-api:
-  encryption:
-    key: !secret home_assistant_api
-
-ota:
-  - platform: esphome
-    password: !secret esphomeapi
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-
-web_server:
-  port: 80
-
 #CONFIG START
 substitutions:
-  btnPlusPin:   GPIO6
-  btnMinusPin:  GPIO7
-  btnCirclePin:   GPIO8
-  btnTrianglePin:  GPIO9
+  friendly_name: ClockMcClockington
   
-  csPin : GPIO34 #or GPIO10
-  mosiPin : GPIO35 #or GPIO11
-  clkPin :  GPIO36 #or GPIO12
+  #Sound pins (I2S)
+  speaker_i2s_lrclk_pin: GPIO13 #WS
+  speaker_i2s_bclk_pin: GPIO11 #SCK
+  speaker_i2s_dout_pin : GPIO12 #DIN
+
+  mic_i2s_ws_pin: GPIO9 #lrclk
+  mic_i2s_sck_pin: GPIO8 #bclk
+  mic_i2s_din_pin : GPIO10  #SD
+
   
-binary_sensor:
-  - platform: gpio
-    pin: ${btnPlusPin}
-    id: buttonPlus
-    name: Clock Button +
+  #Display pins (I2C)
+  mosiPin : GPIO07
+  csPin : GPIO6
+  clkPin :  GPIO05
 
-    on_press: 
-     then:
-      - homeassistant.event:
-            event: esphome.button_pressed
-            data:        
-              title: single_click_node1  
-
-  - platform: gpio
-    pin: ${btnMinusPin}
-    name: Clock Button -
-    id: buttonMinus
-
-    on_press: 
-     then:
-      - homeassistant.event:
-            event: esphome.button_pressed
-            data:        
-              title: single_click_node1  
-
-#      - lambda: |-
-#          id(page) = (id(page) + 1);
-#          if (id(page) > 2) {
-#            id(page) = 1;
-#          }   
-
-  - platform: gpio
-    pin: ${btnCirclePin}
-    name: Clock Button Triangle
-    id: buttonTriangle
-
-    on_press: 
-     then:
-      - homeassistant.event:
-            event: esphome.button_pressed
-            data:        
-              title: single_click_node1  
-
-  - platform: gpio
-    pin: ${btnTrianglePin}
-    name: Clock Button Circle
-    id: buttonCircle
-
-    on_press: 
-     then:
-      - homeassistant.event:
-            event: esphome.button_pressed
-            data:        
-              title: single_click_node1  
-
-#pin config
-spi:
-  clk_pin: ${clkPin}
-  mosi_pin: ${mosiPin}
+  weatherSensor : sensor.imelbo1140_temperature
 
 #global config
 globals:
@@ -109,6 +30,26 @@ globals:
     type: int
     initial_value: "1"
 
+esphome:
+  name: esp32s3zeroclockred
+  friendly_name: ${friendly_name}
+  min_version: 2025.11.0
+  name_add_mac_suffix: false
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
+
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret home_assistant_api
+
 time:
   - platform: homeassistant
     id: hass_time
@@ -116,78 +57,235 @@ time:
 sensor:
   - platform: homeassistant
     id: outside_temp
-    entity_id: sensor.imelbo1140_temperature  #this should probably be configurable from HA?
+    entity_id: ${weatherSensor}  #this should probably be configurable from HA?   
 
-  - platform: adc
-    name: light
-    pin: GPIO17
-    update_interval: 1s
-    attenuation: 12dB
+ota:
+  - platform: esphome
+    password: !secret esphomeapi
 
-    on_value_range:
-      - below: 0.6
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+psram:
+  mode: quad 
+  speed: 80MHz 
+
+i2s_audio:
+#speaker  
+  - id: i2s_out
+    i2s_lrclk_pin: ${speaker_i2s_lrclk_pin}
+    i2s_bclk_pin: ${speaker_i2s_bclk_pin}
+
+#microphone
+  - id: i2s_in
+    i2s_lrclk_pin: ${mic_i2s_ws_pin}
+    i2s_bclk_pin: ${mic_i2s_sck_pin}
+
+speaker:
+  - platform: i2s_audio
+    id: echo_speaker
+    dac_type: external
+    i2s_audio_id: i2s_out
+    i2s_dout_pin: ${speaker_i2s_dout_pin} 
+    channel: mono
+    sample_rate: 48000
+    buffer_duration: 200ms
+
+microphone:
+  - platform: i2s_audio
+    adc_type: external
+    pdm: false
+    id: mickyphone
+    channel: left
+    bits_per_sample: 32bit
+    i2s_audio_id: i2s_in
+    i2s_din_pin: ${mic_i2s_din_pin}
+    correct_dc_offset: true
+
+media_player:
+  - platform: speaker
+    name: "Media Player"
+    internal: False
+    id: echo_media_player
+    announcement_pipeline:
+        speaker: echo_speaker
+        format: WAV
+    codec_support_enabled: false
+    buffer_size: 60000
+
+# VOICE ASSIST STUFF 
+select:
+  - platform: template
+    entity_category: config
+    name: Wake word engine location
+    id: wake_word_engine_location
+    optimistic: true
+    restore_value: true
+    options:
+      - In Home Assistant
+      - On device
+    initial_option: On device
+    on_value:
+      - if:
+          condition:
+            lambda: return x == "In Home Assistant";
+          then:
+            - micro_wake_word.stop:
+            - delay: 500ms
+            - lambda: id(va).set_use_wake_word(true);
+            - voice_assistant.start_continuous:
+      - if:
+          condition:
+            lambda: return x == "On device";
+          then:
+            - lambda: id(va).set_use_wake_word(false);
+            - voice_assistant.stop:
+            - delay: 500ms
+            - micro_wake_word.start:
+              
+voice_assistant:
+  id: va
+  micro_wake_word:
+  microphone:
+    microphone: mickyphone
+    channels: 0
+    gain_factor: 4
+  media_player: echo_media_player
+  noise_suppression_level: 2
+  auto_gain: 31dBFS
+  on_listening: 
+    then:
+        - lambda: |-
+            id(page) = 2;
+  on_idle: 
+    then:
+        - lambda: |-
+            id(page) = 1;
+
+
+  on_end:
+    # Handle the "nevermind" case where there is no announcement
+  # - wait_until:
+  #     condition:
+  #       - media_player.is_announcing:
+  #     timeout: 0.5s
+  # # Restart only mWW if enabled; streaming wake words automatically restart
+    - if:
+        condition:
+          - lambda: |-
+              return id(wake_word_engine_location).current_option() == "On device";
         then:
-          - globals.set: 
-              id: brightness
-              value : "0"
-      - above: 0.6
-        below: 1.0
-        then:
-          - globals.set: 
-              id: brightness
-              value : "5"
-      - above: 1
-        below: 2.0
-        then:
-          - globals.set: 
-              id: brightness
-              value : "10"
-      - above: 2
-        then:
-          - globals.set: 
-              id: brightness
-              value : "15"
+          - wait_until:
+              - and:
+                  - not:
+                      voice_assistant.is_running:
+          - lambda: id(va).set_use_wake_word(false);
+          - micro_wake_word.start:
+
+  on_client_connected:
+    - delay: 2s  # Give the api server time to settle
+    - script.execute: start_wake_word
+  on_client_disconnected:
+    - script.execute: stop_wake_word
+  on_timer_finished:
+    - script.execute: stop_wake_word
+    - wait_until:
+        not:
+          microphone.is_capturing:
+script: 
+  - id: start_wake_word
+    then:
+      - if:
+          condition:
+            and:
+              - not:
+                  - voice_assistant.is_running:
+              - lambda: |-
+                  return id(wake_word_engine_location).current_option() == "On device";
+          then:
+            - lambda: id(va).set_use_wake_word(false);
+            - micro_wake_word.start:
+      - if:
+          condition:
+            and:
+              - not:
+                  - voice_assistant.is_running:
+              - lambda: |-
+                  return id(wake_word_engine_location).current_option() == "In Home Assistant";
+          then:
+            - lambda: id(va).set_use_wake_word(true);
+            - voice_assistant.start_continuous:
+  - id: stop_wake_word
+    then:
+      - if:
+          condition:
+            lambda: |-
+                  return id(wake_word_engine_location).current_option() == "In Home Assistant";
+          then:
+            - lambda: id(va).set_use_wake_word(false);
+            - voice_assistant.stop:
+      - if:
+          condition:
+            lambda: |-
+              return id(wake_word_engine_location).current_option() == "On device";
+          then:
+            - micro_wake_word.stop:
+
+micro_wake_word:
+  on_wake_word_detected:
+    - voice_assistant.start:
+        wake_word: !lambda return wake_word;
+  vad:
+  models:
+    - model: okay_nabu
 
 font:
   - file: "fonts/MatrixLight6X.bdf"
     id: DayFont
     glyphs:  |-
-      ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567980°na 
+      ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567980°na?elo
   - file: "fonts/MatrixLight8X.bdf"
     id: TimeFont
     glyphs:  |-
       0123456789.:
 
-#CONFIG END
 
-# automations
+# SCREEN SETUP
+#pin config
+spi:
+  clk_pin: ${clkPin}
+  mosi_pin: ${mosiPin}
+
 display:
   - platform: max7219digit
     id: led_display
     cs_pin: ${csPin}
     num_chips: 4
     # time_str is the day of the week, then converted to uppercase as strftime has no way to do that natively?
+    #auto time_str = id(hass_time).now().strftime("%a");
+        #std::transform(time_str.begin(), time_str.end(), time_str.begin(), ::toupper);
+    #it.strftime(15, 0, id(TimeFont), "%I:%M", id(hass_time).now());
     lambda: |-
         auto time_str = id(hass_time).now().strftime("%a");
         std::transform(time_str.begin(), time_str.end(), time_str.begin(), ::toupper);
-        it.strftime(15, 0, id(TimeFont), "%I:%M", id(hass_time).now());
+        
 
         switch (id(page))
         {
           case 1:
+            it.strftime(15, 0, id(TimeFont), "%I:%M", id(hass_time).now());
             it.print(0, 2, id(DayFont), time_str.c_str());
             it.line(0, 0, 11, 0);
             break;
 
           case 2:
-            it.printf(0, 0, id(DayFont), "%g°", id(outside_temp).state);
-            it.line(0, 7, 9, 7);
+            it.print(8, 0, id(DayFont), "Hello?");
             break;
         }
 
         it.intensity(id(brightness));
-        
-# Manual override for the clocks brightness          
+
 number:
   - platform: template
     name: "Clock Brightness Override"

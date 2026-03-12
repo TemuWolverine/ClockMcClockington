@@ -1,0 +1,6 @@
+Default	True	2.0	3
+3v3	True	2.0	3
+5v	True	1.0	3
+GND	True	2.0	3
+Signal	True	5.0	3
+False	True	False

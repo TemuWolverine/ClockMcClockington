@@ -496,7 +496,7 @@
         "priority": 3,
         "schematic_color": "rgb(255, 54, 50)",
         "track_width": 1.0,
-        "wire_width": 30
+        "wire_width": 0
       },
       {
         "bus_width": 0,
@@ -506,7 +506,7 @@
         "priority": 0,
         "schematic_color": "rgb(255, 165, 35)",
         "track_width": 1.0,
-        "wire_width": 30
+        "wire_width": 0
       },
       {
         "bus_width": 0,
@@ -516,7 +516,7 @@
         "priority": 2,
         "schematic_color": "rgb(101, 255, 0)",
         "track_width": 1.0,
-        "wire_width": 40
+        "wire_width": 0
       },
       {
         "bus_width": 0,
@@ -526,7 +526,7 @@
         "priority": 1,
         "schematic_color": "rgb(8, 61, 255)",
         "track_width": 0.4,
-        "wire_width": 20
+        "wire_width": 0
       }
     ],
     "meta": {
@@ -690,6 +690,34 @@
       {
         "netclass": "Signal",
         "pattern": "SD"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "Speaker DIN"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "WS{slash}LRCK"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SCK{slash}BLCK"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "MIC_DIN"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "LRCK"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "BLCK"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "SPK_DOUT"
       }
     ]
   },
