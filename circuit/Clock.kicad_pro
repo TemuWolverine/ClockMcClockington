@@ -718,6 +718,22 @@
       {
         "netclass": "Signal",
         "pattern": "SPK_DOUT"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "btnFour"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "btnOne"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "btnThree"
+      },
+      {
+        "netclass": "Signal",
+        "pattern": "btnTwo"
       }
     ]
   },
