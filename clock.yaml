@@ -1,7 +1,9 @@
 #CONFIG START
 substitutions:
   friendly_name: ClockMcClockington
-  
+  device_name: esp32s3zeroclockred
+  weatherSensor : sensor.imelbo1140_temperature
+
   #Sound pins (I2S)
   speaker_i2s_lrclk_pin: GPIO13 #WS
   speaker_i2s_bclk_pin: GPIO11 #SCK
@@ -11,13 +13,46 @@ substitutions:
   mic_i2s_sck_pin: GPIO8 #bclk
   mic_i2s_din_pin : GPIO10  #SD
 
-  
   #Display pins (I2C)
   mosiPin : GPIO07
   csPin : GPIO6
   clkPin :  GPIO05
 
-  weatherSensor : sensor.imelbo1140_temperature
+  #light sensor pin
+  ldr_pin: GPIO4
+  
+  #button pins
+  button_one: GPIO13
+  button_two: GPIO12
+  button_three: GPIO11
+  button_four: GPOI10
+
+packages:
+  esphome_templates:
+    url: https://github.com/TemuWolverine/esphome_templates
+    ref: main
+    files:
+      - esphome_boilerplate.yaml
+      - boards/esp32_s3_zero.yaml
+      - devices/ldr-GL5516.yaml
+      - devices/i2s/INMP441.yaml
+      - devices/i2s/MAX98357.yaml
+      - devices/display/max7219.yaml
+
+api:
+  encryption:
+    key: !secret home_assistant_api
+
+#Fonts
+font:
+  - file: "fonts/5x7.bdf"
+    id: DayFont
+    glyphs:  |-
+      ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567980°na?elo
+  - file: "fonts/MatrixLight8X.bdf"
+    id: TimeFont
+    glyphs:  |-
+      0123456789.: 
 
 #global config
 globals:
@@ -30,78 +65,58 @@ globals:
     type: int
     initial_value: "1"
 
-esphome:
-  name: esp32s3zeroclockred
-  friendly_name: ${friendly_name}
-  min_version: 2025.11.0
-  name_add_mac_suffix: false
-
-esp32:
-  board: esp32-s3-devkitc-1
-  framework:
-    type: esp-idf
-
-
-# Enable logging
-logger:
-
-# Enable Home Assistant API
-api:
-  encryption:
-    key: !secret home_assistant_api
+  - id: time_sync_done
+    type: bool
 
 time:
   - platform: homeassistant
     id: hass_time
 
+  - platform: sntp
+    id: sntp_time
+    on_time_sync:
+      then:
+        lambda: |-
+          id(time_sync_done) = true;
+
+interval:
+  - interval: 30s
+    then:
+      - lambda: |-
+          if (id(page) == 1) {
+            id(page) = 2;
+          } else {
+            id(page) = 1;
+          }
 sensor:
   - platform: homeassistant
     id: outside_temp
-    entity_id: ${weatherSensor}  #this should probably be configurable from HA?   
+    entity_id: ${weatherSensor}
 
-ota:
-  - platform: esphome
-    password: !secret esphomeapi
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-
-psram:
-  mode: quad 
-  speed: 80MHz 
-
-i2s_audio:
-#speaker  
-  - id: i2s_out
-    i2s_lrclk_pin: ${speaker_i2s_lrclk_pin}
-    i2s_bclk_pin: ${speaker_i2s_bclk_pin}
-
-#microphone
-  - id: i2s_in
-    i2s_lrclk_pin: ${mic_i2s_ws_pin}
-    i2s_bclk_pin: ${mic_i2s_sck_pin}
-
-speaker:
-  - platform: i2s_audio
-    id: echo_speaker
-    dac_type: external
-    i2s_audio_id: i2s_out
-    i2s_dout_pin: ${speaker_i2s_dout_pin} 
-    channel: mono
-    sample_rate: 48000
-    buffer_duration: 200ms
-
-microphone:
-  - platform: i2s_audio
-    adc_type: external
-    pdm: false
-    id: mickyphone
-    channel: left
-    bits_per_sample: 32bit
-    i2s_audio_id: i2s_in
-    i2s_din_pin: ${mic_i2s_din_pin}
-    correct_dc_offset: true
+  - id: !extend ldr_light
+    on_value_range:
+      - below: 0.4
+        then:
+          - globals.set: 
+              id: brightness
+              value : "0"
+      - above: 0.4
+        below: 0.8
+        then:
+          - globals.set: 
+              id: brightness
+              value : "5"
+      - above: 0.8
+        below: 2.0
+        then:
+          - globals.set: 
+              id: brightness
+              value : "10"
+      - above: 2
+        then:
+          - globals.set: 
+              id: brightness
+              value : "15"
 
 media_player:
   - platform: speaker
@@ -109,7 +124,7 @@ media_player:
     internal: False
     id: echo_media_player
     announcement_pipeline:
-        speaker: echo_speaker
+        speaker: i2s_speaker
         format: WAV
     codec_support_enabled: false
     buffer_size: 60000
@@ -148,7 +163,7 @@ voice_assistant:
   id: va
   micro_wake_word:
   microphone:
-    microphone: mickyphone
+    microphone: i2s_microphone
     channels: 0
     gain_factor: 4
   media_player: echo_media_player
@@ -157,13 +172,11 @@ voice_assistant:
   on_listening: 
     then:
         - lambda: |-
-            id(page) = 2;
+            id(page) = 3;
   on_idle: 
     then:
         - lambda: |-
             id(page) = 1;
-
-
   on_end:
     # Handle the "nevermind" case where there is no announcement
   # - wait_until:
@@ -182,7 +195,12 @@ voice_assistant:
                       voice_assistant.is_running:
           - lambda: id(va).set_use_wake_word(false);
           - micro_wake_word.start:
-
+          - lambda: |-
+              id(page) = 1;
+  on_stt_vad_end: 
+    then:
+        - lambda: |-
+            id(page) = 1;
   on_client_connected:
     - delay: 2s  # Give the api server time to settle
     - script.execute: start_wake_word
@@ -240,50 +258,65 @@ micro_wake_word:
   models:
     - model: okay_nabu
 
-font:
-  - file: "fonts/MatrixLight6X.bdf"
-    id: DayFont
-    glyphs:  |-
-      ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567980°na?elo
-  - file: "fonts/MatrixLight8X.bdf"
-    id: TimeFont
-    glyphs:  |-
-      0123456789.:
-
-
-# SCREEN SETUP
-#pin config
-spi:
-  clk_pin: ${clkPin}
-  mosi_pin: ${mosiPin}
-
 display:
-  - platform: max7219digit
-    id: led_display
-    cs_pin: ${csPin}
-    num_chips: 4
-    # time_str is the day of the week, then converted to uppercase as strftime has no way to do that natively?
-    #auto time_str = id(hass_time).now().strftime("%a");
-        #std::transform(time_str.begin(), time_str.end(), time_str.begin(), ::toupper);
-    #it.strftime(15, 0, id(TimeFont), "%I:%M", id(hass_time).now());
+  - id: !extend led_display
     lambda: |-
-        auto time_str = id(hass_time).now().strftime("%a");
-        std::transform(time_str.begin(), time_str.end(), time_str.begin(), ::toupper);
-        
+        static bool clock_should_blink = true;
 
+        auto time_str = id(hass_time).now().strftime("%a");
         switch (id(page))
         {
-          case 1:
-            it.strftime(15, 0, id(TimeFont), "%I:%M", id(hass_time).now());
-            it.print(0, 2, id(DayFont), time_str.c_str());
-            it.line(0, 0, 11, 0);
-            break;
+        case 1:
+          std::transform(time_str.begin(), time_str.end(), time_str.begin(), ::toupper);
+          
 
-          case 2:
+          {
+            int hour12 = id(hass_time).now().hour % 12 == 0 ? 12 : id(hass_time).now().hour % 12;
+            char hour_str[3];
+            sprintf(hour_str, "%d", hour12);
+            int text_width, text_height, x_offset, y_offset;
+            it.get_text_bounds(0, 0, hour_str, id(TimeFont), TextAlign::TOP_LEFT, &x_offset, &y_offset, &text_width, &text_height);
+            it.print(23 - text_width, 0, id(TimeFont), hour_str);
+          }
+
+          it.strftime(25, 0, id(TimeFont), "%M", id(hass_time).now());
+          it.print(0, 2, id(DayFont), time_str.c_str());
+          it.line(0, 0, 13, 0);
+
+          if (clock_should_blink) {
+            it.print(23, 0, id(TimeFont), ":");
+          }
+          break;
+          
+        case 2:
+
+          std::transform(time_str.begin(), time_str.end(), time_str.begin(), ::toupper);
+
+          {
+            int hour12 = id(hass_time).now().hour % 12 == 0 ? 12 : id(hass_time).now().hour % 12;
+            char hour_str[3];
+            sprintf(hour_str, "%d", hour12);
+            int text_width, text_height, x_offset, y_offset;
+            it.get_text_bounds(0, 0, hour_str, id(TimeFont), TextAlign::TOP_LEFT, &x_offset, &y_offset, &text_width, &text_height);
+            it.print(23 - text_width, 0, id(TimeFont), hour_str);
+          }
+
+          it.strftime(25, 0, id(TimeFont), "%M", id(hass_time).now());
+
+          if (clock_should_blink) {
+            it.print(23, 0, id(TimeFont), ":");
+          }
+
+          it.printf(0, 0, id(DayFont), "%g°", id(outside_temp).state);
+          it.line(0, 7, 9, 7);
+          break;
+
+          case 3:
             it.print(8, 0, id(DayFont), "Hello?");
             break;
         }
 
+        clock_should_blink = !clock_should_blink;
         it.intensity(id(brightness));
 
 number:
