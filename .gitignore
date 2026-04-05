@@ -1,3 +1,6 @@
 /circuit/Clock-backups
 *.lck
 circuit/fp-info-cache
+circuit/production/
+circuit/Clock_PCB.3mf
+circuit/pcb.step
