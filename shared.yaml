@@ -1,0 +1,45 @@
+#Fonts
+font:
+  - file: "fonts/5x7.bdf"
+    id: DayFont
+    glyphs:  |-
+      ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567980°na?elo
+  - file: "fonts/MatrixLight8X.bdf"
+    id: TimeFont
+    glyphs:  |-
+      0123456789.: 
+
+#global config
+globals:
+  - id: brightness
+    type: int
+    restore_value: no
+    initial_value: '15'
+
+  - id: page
+    type: int
+    initial_value: "1"
+
+  - id: time_sync_done
+    type: bool
+
+time:
+  - platform: homeassistant
+    id: hass_time
+
+  - platform: sntp
+    id: sntp_time
+    on_time_sync:
+      then:
+        lambda: |-
+          id(time_sync_done) = true;
+
+interval:
+  - interval: 30s
+    then:
+      - lambda: |-
+          if (id(page) == 1) {
+            id(page) = 2;
+          } else {
+            id(page) = 1;
+          }
