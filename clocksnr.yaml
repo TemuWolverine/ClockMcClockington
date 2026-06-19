@@ -1,0 +1,111 @@
+author: Paul Jenkins
+name: ClockMcClockington Senior
+version: 0.1
+source: https://github.com/TemuWolverine/ClockMcClockington
+labels: [clock, led matrix, esp32, ws2815]
+---
+
+substitutions:
+  friendly_name: ClockMcClockingtonSnr
+  device_name: clockmcclockington-snr
+  weatherSensor : sensor.imelbo1140_temperature
+
+packages:
+  esphome_templates:
+    url: https://github.com/TemuWolverine/esphome_templates
+    ref: main
+    files:
+      - esphome_boilerplate.yaml
+#      - devices/ldr-GL5516.yaml
+
+  clockmcclockington:
+    url: https://github.com/TemuWolverine/ClockMcClockington
+    ref: main
+    refresh: 20s
+    files:
+      - shared.yaml
+
+esp32:
+  variant: esp32
+  framework:
+    type: esp-idf
+  
+number:
+  - platform: template
+    name: "Clock Brightness Override"
+    id: clock_brightness_override
+    internal: false
+    max_value: 15.0
+    min_value: 0.0
+    step: 1
+    optimistic: true
+    mode: slider
+    on_value:
+      then:
+        - globals.set: 
+            id: brightness
+            value : !lambda "return x;"
+       # - light.turn_on: 
+       #         id: led_matrix_light
+       #         brightness: !lambda "return x;"
+
+light:
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    pin: GPIO016
+    num_leds: 256
+    chipset: ws2812
+    id: led_matrix_light   
+
+display:
+  - platform: addressable_light
+    id: led_matrix_display
+    addressable_light_id: led_matrix_light
+    width: 32
+    height: 8
+    pixel_mapper: |-
+          if (y % 2 == 0) {
+            return (y * 32) + x;
+          } else {
+            return (y * 32) + (33 - x);
+          }
+    rotation: 0°
+    update_interval: 2s
+    lambda: |-
+        static bool clock_should_blink = true;
+
+        auto time_str = id(hass_time).now().strftime("%a");
+        auto white = Color(128, 128, 128);
+        Color green = Color(0, 128, 0);
+        
+        //Calculate 12-hour format hour and its text width for right-alignment
+        int hour12 = id(hass_time).now().hour % 12 == 0 ? 12 : id(hass_time).now().hour % 12;
+        char hour_str[3];
+        sprintf(hour_str, "%d", hour12);
+        int text_width, text_height, x_offset, y_offset;
+        it.get_text_bounds(0, 0, hour_str, id(TimeFont),  TextAlign::TOP_LEFT, &x_offset, &y_offset, &text_width, &text_height);
+
+        //print the time
+        it.print(23 - text_width, 0, id(TimeFont),  white, hour_str);
+        it.strftime(25, 0, id(TimeFont), white, "%M",   id(hass_time).now());
+
+        if (clock_should_blink) {
+          it.print(23, 0, id(TimeFont),  white, ":");
+        }
+
+        switch (id(page))
+        {
+          case 1: //Day
+            std::transform(time_str.begin(), time_str.end(), time_str.begin(), ::toupper);
+            it.print(0, 2, id(DayFont), white, time_str.c_str());
+            it.line(0, 0, 13, 0);
+            
+            break;
+
+          case 2: //Temperature
+            it.printf(0, 0, id(DayFont),  green, "%g°", id(outside_temp).state);
+            it.line(0, 7, 9, 7);
+            break;
+        }
+
+        clock_should_blink = !clock_should_blink;

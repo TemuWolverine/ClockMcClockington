@@ -1,135 +1,205 @@
-#CONFIG START
+author: Paul Jenkins
+name: ClockMcClockington
+version: 0.1
+source: https://github.com/TemuWolverine/ClockMcClockington
+labels: [clock, led matrix, esp32]
+---
+
 substitutions:
   friendly_name: ClockMcClockington
-  device_name: esp32s3zeroclockred
+  device_name: clockmcclockington
   weatherSensor : sensor.imelbo1140_temperature
 
   #Sound pins (I2S)
-  speaker_i2s_lrclk_pin: GPIO13 #WS
-  speaker_i2s_bclk_pin: GPIO11 #SCK
-  speaker_i2s_dout_pin : GPIO12 #DIN
+  speaker_i2s_lrclk_pin: GPIO45 #WS
+  speaker_i2s_bclk_pin: GPIO42 #SCK
+  speaker_i2s_dout_pin : GPIO41 #DIN
 
-  mic_i2s_ws_pin: GPIO9 #lrclk
-  mic_i2s_sck_pin: GPIO8 #bclk
-  mic_i2s_din_pin : GPIO10  #SD
+  mic_i2s_ws_pin: GPIO7 #lrclk
+  mic_i2s_sck_pin: GPIO6 #bclk
+  mic_i2s_din_pin : GPIO8  #SD
 
   #Display pins (I2C)
-  mosiPin : GPIO07
-  csPin : GPIO6
-  clkPin :  GPIO05
+  mosiPin : GPIO39
+  csPin : GPIO40
+  clkPin :  GPIO21
 
   #light sensor pin
-  ldr_pin: GPIO4
+  ldr_pin: GPIO15
   
   #button pins
   button_one: GPIO13
   button_two: GPIO12
   button_three: GPIO11
-  button_four: GPOI10
+  button_four: GPIO10
+
+  mediaplayer: "speakerguy"
+  i2s_microphone: "i2s_microphone"
 
 packages:
   esphome_templates:
     url: https://github.com/TemuWolverine/esphome_templates
     ref: main
+    refresh: 1d
     files:
       - esphome_boilerplate.yaml
-      - boards/esp32_s3_zero.yaml
-      - devices/ldr-GL5516.yaml
+      - boards/esp32_s3_nano.yaml
+      #- devices/ldr-GL5516.yaml
       - devices/i2s/INMP441.yaml
       - devices/i2s/MAX98357.yaml
       - devices/display/max7219.yaml
+      #- devices/voiceassistant.yaml
+
+  clockmcclockington:
+    url: https://github.com/TemuWolverine/ClockMcClockington
+    ref: main
+    files:
+      - shared.yaml
+
+logger:
+  level: DEBUG
 
 api:
   encryption:
-    key: !secret home_assistant_api
-
-#Fonts
-font:
-  - file: "fonts/5x7.bdf"
-    id: DayFont
-    glyphs:  |-
-      ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567980°na?elo
-  - file: "fonts/MatrixLight8X.bdf"
-    id: TimeFont
-    glyphs:  |-
-      0123456789.: 
+    key: "2U6JD2YBfgjm25mqFDDrJrVq+zOdJLxbYebM7egTPTY="
 
 #global config
 globals:
-  - id: brightness
-    type: int
-    restore_value: no
-    initial_value: '15'
-
-  - id: page
-    type: int
-    initial_value: "1"
-
-  - id: time_sync_done
+  - id: startup_complete
     type: bool
+    initial_value: 'false'
 
-time:
-  - platform: homeassistant
-    id: hass_time
 
-  - platform: sntp
-    id: sntp_time
-    on_time_sync:
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: ${button_one}
+      mode:
+        input: true
+        pullup: true
+    id: btnOne
+    internal: True
+    name: "Clock Button One"
+    on_press:
       then:
-        lambda: |-
-          id(time_sync_done) = true;
+        - homeassistant.event:
+            event: esphome.clock_button_pressed
+            data: { button: "one", type: "single" }
 
-interval:
-  - interval: 30s
-    then:
-      - lambda: |-
-          if (id(page) == 1) {
-            id(page) = 2;
-          } else {
-            id(page) = 1;
-          }
+  - platform: gpio
+    pin:
+      number: ${button_two}
+      mode:
+        input: true
+        pullup: true
+    id: btnTwo
+    internal: True
+    name: "Clock Button Two"
+    on_press:
+      then:
+        - homeassistant.event:
+            event: esphome.clock_button_pressed
+            data: { button: "two", type: "single" }
+
+  - platform: gpio
+    pin:
+      number: ${button_three}
+      mode:
+        input: true
+        pullup: true
+    id: btnThree
+    name: "Clock Button Three"
+    internal: True
+    on_press:
+      then:
+        - homeassistant.event:
+            event: esphome.clock_button_pressed
+            data: { button: "three", type: "single" }
+
+  - platform: gpio
+    pin:
+      number: ${button_four}
+      mode:
+        input: true
+        pullup: true
+    id: btnFour
+    name: "Clock Button Four"
+    internal: True
+    on_press:
+      then:
+        - homeassistant.event:
+            event: esphome.clock_button_pressed
+            data: { button: "four", type: "single" }
+
 sensor:
-  - platform: homeassistant
-    id: outside_temp
-    entity_id: ${weatherSensor}
-
-  - id: !extend ldr_light
+  - platform: adc
+    id: ldr_light
+    pin: ${ldr_pin}
+    update_interval: 1s
+    attenuation: 12db
     on_value_range:
-      - below: 0.4
+      - below: 0.3
         then:
           - globals.set: 
               id: brightness
               value : "0"
-      - above: 0.4
+          - logger.log:
+              format: "Light Sensor Reports %.1f"
+              args: [ 'id(ldr_light).state']
+      - above: 0.3
         below: 0.8
         then:
           - globals.set: 
               id: brightness
               value : "5"
+          - logger.log:
+              format: "Light Sensor Reports %.1f"
+              args: [ 'id(ldr_light).state']
       - above: 0.8
         below: 2.0
         then:
           - globals.set: 
               id: brightness
               value : "10"
+          - logger.log:
+              format: "Light Sensor Reports %.1f"
+              args: [ 'id(ldr_light).state']
       - above: 2
         then:
           - globals.set: 
               id: brightness
               value : "15"
 
+          - logger.log:
+              format: "Light Sensor Reports %.1f"
+              args: [ 'id(ldr_light).state']
+
 media_player:
   - platform: speaker
     name: "Media Player"
     internal: False
-    id: echo_media_player
+    id: ${mediaplayer}
     announcement_pipeline:
         speaker: i2s_speaker
         format: WAV
     codec_support_enabled: false
-    buffer_size: 60000
+    buffer_size: 6000
+    volume_min: 0.4
 
-# VOICE ASSIST STUFF 
+    files:
+      - id: timer_finished_wave_file
+        file: https://github.com/esphome/wake-word-voice-assistants/raw/main/sounds/timer_finished.wav
+
+    on_announcement:
+      - if:
+          condition:
+            - microphone.is_capturing:
+          then:
+            - script.execute: stop_wake_word
+    on_idle:
+      - script.execute: start_wake_word
+
+## VOICE ASSIST STUFF 
 select:
   - platform: template
     entity_category: config
@@ -166,7 +236,7 @@ voice_assistant:
     microphone: i2s_microphone
     channels: 0
     gain_factor: 4
-  media_player: echo_media_player
+  media_player: ${mediaplayer}
   noise_suppression_level: 2
   auto_gain: 31dBFS
   on_listening: 
@@ -179,11 +249,11 @@ voice_assistant:
             id(page) = 1;
   on_end:
     # Handle the "nevermind" case where there is no announcement
-  # - wait_until:
-  #     condition:
-  #       - media_player.is_announcing:
-  #     timeout: 0.5s
-  # # Restart only mWW if enabled; streaming wake words automatically restart
+    - wait_until:
+        condition:
+          - media_player.is_announcing:
+        timeout: 0.5s
+    # Restart only mWW if enabled; streaming wake words automatically restart
     - if:
         condition:
           - lambda: |-
@@ -256,7 +326,7 @@ micro_wake_word:
         wake_word: !lambda return wake_word;
   vad:
   models:
-    - model: okay_nabu
+    - model: hey_jarvis
 
 display:
   - id: !extend led_display
@@ -319,18 +389,18 @@ display:
         clock_should_blink = !clock_should_blink;
         it.intensity(id(brightness));
 
-number:
-  - platform: template
-    name: "Clock Brightness Override"
-    id: clock_brightness_override
-    internal: false
-    max_value: 15.0
-    min_value: 0.0
-    step: 1
-    optimistic: true
-    mode: slider
-    on_value:
-      then:
-        - globals.set: 
-            id: brightness
-            value : !lambda "return x;"
+#number:
+#  - platform: template
+#    name: "Clock Brightness Override"
+#    id: clock_brightness_override
+#    internal: false
+#    max_value: 15.0
+#    min_value: 0.0
+#    step: 1
+#    optimistic: true
+#    mode: slider
+#    on_value:
+#      then:
+#        - globals.set: 
+#            id: brightness
+#            value : !lambda "return x;"
