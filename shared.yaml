@@ -43,3 +43,8 @@ interval:
           } else {
             id(page) = 1;
           }
+
+sensor:
+  - platform: homeassistant
+    id: outside_temp
+    entity_id: ${weatherSensor}
