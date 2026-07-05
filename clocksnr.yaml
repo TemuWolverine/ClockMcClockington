@@ -29,15 +29,15 @@ esp32:
   variant: esp32
   framework:
     type: esp-idf
-  
+   
 number:
   - platform: template
     name: "Clock Brightness Override"
     id: clock_brightness_override
     internal: false
-    max_value: 15.0
-    min_value: 0.0
-    step: 1
+    max_value: 100
+    min_value: 15
+    step: 5
     optimistic: true
     mode: slider
     on_value:
@@ -45,15 +45,12 @@ number:
         - globals.set: 
             id: brightness
             value : !lambda "return x;"
-       # - light.turn_on: 
-       #         id: led_matrix_light
-       #         brightness: !lambda "return x;"
 
 light:
   - platform: esp32_rmt_led_strip
     rgb_order: GRB
-    pin: GPIO016
-    num_leds: 256
+    pin: GPIO2
+    num_leds: 257
     chipset: ws2812
     id: led_matrix_light   
 
@@ -62,21 +59,26 @@ display:
     id: led_matrix_display
     addressable_light_id: led_matrix_light
     width: 32
-    height: 8
-    pixel_mapper: |-
-          if (y % 2 == 0) {
-            return (y * 32) + x;
-          } else {
-            return (y * 32) + (33 - x);
-          }
+    height: 9
+
     rotation: 0°
     update_interval: 2s
+    pixel_mapper: |-
+      int num=0;
+      if (y % 2 == 0) {
+        num = (y * 32) + x;
+      } else {
+        num =  (y * 32) + (31 - x);
+      }
+
+      return num +1;
     lambda: |-
         static bool clock_should_blink = true;
 
-        auto time_str = id(hass_time).now().strftime("%a");
-        auto white = Color(128, 128, 128);
-        Color green = Color(0, 128, 0);
+        int maxbright = (int)((id(brightness)/100.0) * 255);
+        auto time_str = id(hass_time).now().strftime("%a");//this needs to sit outside the switch
+        auto white = Color(maxbright, maxbright, maxbright);
+        Color green = Color(0, maxbright, 0);
         
         //Calculate 12-hour format hour and its text width for right-alignment
         int hour12 = id(hass_time).now().hour % 12 == 0 ? 12 : id(hass_time).now().hour % 12;
@@ -98,13 +100,13 @@ display:
           case 1: //Day
             std::transform(time_str.begin(), time_str.end(), time_str.begin(), ::toupper);
             it.print(0, 2, id(DayFont), white, time_str.c_str());
-            it.line(0, 0, 13, 0);
+            it.line(0, 0, 13, 0, white);
             
             break;
 
           case 2: //Temperature
             it.printf(0, 0, id(DayFont),  green, "%g°", id(outside_temp).state);
-            it.line(0, 7, 9, 7);
+            it.line(0, 7, 9, 7, white);
             break;
         }
 
