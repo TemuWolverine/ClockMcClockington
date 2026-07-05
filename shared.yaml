@@ -10,7 +10,7 @@ font:
   - file: "fonts/5x7.bdf"
     id: DayFont
     glyphs:  |-
-      ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567980°na?elo
+      -ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567980°na?elo
   - file: "fonts/MatrixLight8X.bdf"
     id: TimeFont
     glyphs:  |-
