@@ -13,7 +13,7 @@ esphome:
 # In this case it is the core yaml file that does not contain the extra things
 # that are provided by this factory yaml file as the user does not need these once adopted.
 dashboard_import:
-  package_import_url: github://TemuWolverine/ClockMcClockington/clock.yaml
+  package_import_url: github://TemuWolverine/ClockMcClockington/clock.yaml@main
   import_full_config: true
 
 # Sets up Bluetooth LE (Only on ESP32) to allow the user
