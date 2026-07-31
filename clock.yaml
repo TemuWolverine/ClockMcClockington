@@ -42,8 +42,6 @@ packages:
     ref: main
     refresh: 1s
     files:
-      - esphome_boilerplate.yaml
-      - boards/esp32_s3_nano.yaml
       - devices/i2s/INMP441.yaml
       - devices/i2s/MAX98357.yaml
       - devices/display/max7219.yaml
@@ -54,13 +52,37 @@ packages:
     ref: main
     files:
       - shared.yaml
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: true
 
+
+esp32:
+  variant: ESP32S3
+  framework:
+    type: esp-idf
+
+psram:
+  mode: octal
+
+# To be able to get logs from the device via serial and api.
 logger:
-  level: DEBUG
 
+# API is a requirement of the dashboard import.
 api:
-  encryption:
-    key: "2U6JD2YBfgjm25mqFDDrJrVq+zOdJLxbYebM7egTPTY="
+
+# OTA is required for Over-the-Air updating
+ota:
+  - platform: esphome
+
+wifi:
+  # Set up a wifi access point using the device name above
+  ap:
+
+# In combination with the `ap` this allows the user
+# to provision wifi credentials to the device.
+captive_portal:
 
 #global config
 globals:
