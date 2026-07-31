@@ -6,7 +6,7 @@ labels: [clock, led matrix, esp32]
 ---
 
 substitutions:
-  friendly_name: ClockMcClockington
+  friendly_name: Clock McClockington
   device_name: clockmcclockington
   weatherSensor : sensor.imelbo1140_temperature
 
@@ -40,15 +40,14 @@ packages:
   esphome_templates:
     url: https://github.com/TemuWolverine/esphome_templates
     ref: main
-    refresh: 1d
+    refresh: 1s
     files:
       - esphome_boilerplate.yaml
       - boards/esp32_s3_nano.yaml
-      #- devices/ldr-GL5516.yaml
       - devices/i2s/INMP441.yaml
       - devices/i2s/MAX98357.yaml
       - devices/display/max7219.yaml
-      #- devices/voiceassistant.yaml
+      - devices/voiceassistant.yaml
 
   clockmcclockington:
     url: https://github.com/TemuWolverine/ClockMcClockington
@@ -69,6 +68,74 @@ globals:
     type: bool
     initial_value: 'false'
 
+  - id: brightness_dark_cfg
+    type: int
+    restore_value: yes
+    initial_value: '0'
+
+  - id: brightness_dim_cfg
+    type: int
+    restore_value: yes
+    initial_value: '5'
+
+  - id: brightness_mid_cfg
+    type: int
+    restore_value: yes
+    initial_value: '10'
+
+  - id: brightness_bright_cfg
+    type: int
+    restore_value: yes
+    initial_value: '15'
+
+number:
+  - platform: template
+    name: "1. Dark"
+    id: ldr_brightness_dark
+    min_value: 0
+    max_value: 15
+    step: 1
+    optimistic: true
+    set_action:
+      - globals.set:
+          id: brightness_dark_cfg
+          value: !lambda 'return (int) x;'
+
+  - platform: template
+    name: "2. Dim"
+    id: ldr_brightness_dim
+    min_value: 0
+    max_value: 15
+    step: 1
+    optimistic: true
+    set_action:
+      - globals.set:
+          id: brightness_dim_cfg
+          value: !lambda 'return (int) x;'
+
+  - platform: template
+    name: "3. Mid"
+    id: ldr_brightness_mid
+    min_value: 0
+    max_value: 15
+    step: 1
+    optimistic: true
+    set_action:
+      - globals.set:
+          id: brightness_mid_cfg
+          value: !lambda 'return (int) x;'
+
+  - platform: template
+    name: "4. Bright"
+    id: ldr_brightness_bright
+    min_value: 0
+    max_value: 15
+    step: 1
+    optimistic: true
+    set_action:
+      - globals.set:
+          id: brightness_bright_cfg
+          value: !lambda 'return (int) x;'
 
 binary_sensor:
   - platform: gpio
@@ -83,7 +150,7 @@ binary_sensor:
     on_press:
       then:
         - homeassistant.event:
-            event: esphome.clock_button_pressed
+            event: esphome.${device_name}.clock_button_pressed
             data: { button: "one", type: "single" }
 
   - platform: gpio
@@ -98,7 +165,7 @@ binary_sensor:
     on_press:
       then:
         - homeassistant.event:
-            event: esphome.clock_button_pressed
+            event: esphome.${device_name}.clock_button_pressed
             data: { button: "two", type: "single" }
 
   - platform: gpio
@@ -113,7 +180,7 @@ binary_sensor:
     on_press:
       then:
         - homeassistant.event:
-            event: esphome.clock_button_pressed
+            event: esphome.${device_name}.clock_button_pressed
             data: { button: "three", type: "single" }
 
   - platform: gpio
@@ -128,7 +195,7 @@ binary_sensor:
     on_press:
       then:
         - homeassistant.event:
-            event: esphome.clock_button_pressed
+            event: esphome.${device_name}.clock_button_pressed
             data: { button: "four", type: "single" }
 
 sensor:
@@ -140,40 +207,51 @@ sensor:
     on_value_range:
       - below: 0.3
         then:
-          - globals.set: 
+          - globals.set:
               id: brightness
-              value : "0"
+              value: !lambda 'return (int) id(brightness_dark_cfg);'
           - logger.log:
               format: "Light Sensor Reports %.1f"
-              args: [ 'id(ldr_light).state']
+              args: [ 'id(ldr_light).state' ]
+
       - above: 0.3
         below: 0.8
         then:
-          - globals.set: 
+          - globals.set:
               id: brightness
-              value : "5"
+              value: !lambda 'return (int) id(brightness_dim_cfg);'
           - logger.log:
               format: "Light Sensor Reports %.1f"
-              args: [ 'id(ldr_light).state']
+              args: [ 'id(ldr_light).state' ]
+
       - above: 0.8
         below: 2.0
         then:
-          - globals.set: 
+          - globals.set:
               id: brightness
-              value : "10"
+              value: !lambda 'return (int) id(brightness_mid_cfg);'
           - logger.log:
               format: "Light Sensor Reports %.1f"
-              args: [ 'id(ldr_light).state']
+              args: [ 'id(ldr_light).state' ]
+
       - above: 2
         then:
-          - globals.set: 
+          - globals.set:
               id: brightness
-              value : "15"
-
+              value: !lambda 'return (int) id(brightness_bright_cfg);'
           - logger.log:
               format: "Light Sensor Reports %.1f"
-              args: [ 'id(ldr_light).state']
+              args: [ 'id(ldr_light).state' ]
 
+  - platform: template
+    name: "LDR Brightness Level"
+    id: ldr_brightness_level
+    unit_of_measurement: 'v'
+    icon: "mdi:brightness-6"
+    update_interval: 1s
+    lambda: |-
+      return (float) id(ldr_light).state;
+      
 media_player:
   - platform: speaker
     name: "Media Player"
@@ -198,135 +276,6 @@ media_player:
             - script.execute: stop_wake_word
     on_idle:
       - script.execute: start_wake_word
-
-## VOICE ASSIST STUFF 
-select:
-  - platform: template
-    entity_category: config
-    name: Wake word engine location
-    id: wake_word_engine_location
-    optimistic: true
-    restore_value: true
-    options:
-      - In Home Assistant
-      - On device
-    initial_option: On device
-    on_value:
-      - if:
-          condition:
-            lambda: return x == "In Home Assistant";
-          then:
-            - micro_wake_word.stop:
-            - delay: 500ms
-            - lambda: id(va).set_use_wake_word(true);
-            - voice_assistant.start_continuous:
-      - if:
-          condition:
-            lambda: return x == "On device";
-          then:
-            - lambda: id(va).set_use_wake_word(false);
-            - voice_assistant.stop:
-            - delay: 500ms
-            - micro_wake_word.start:
-              
-voice_assistant:
-  id: va
-  micro_wake_word:
-  microphone:
-    microphone: i2s_microphone
-    channels: 0
-    gain_factor: 4
-  media_player: ${mediaplayer}
-  noise_suppression_level: 2
-  auto_gain: 31dBFS
-  on_listening: 
-    then:
-        - lambda: |-
-            id(page) = 3;
-  on_idle: 
-    then:
-        - lambda: |-
-            id(page) = 1;
-  on_end:
-    # Handle the "nevermind" case where there is no announcement
-    - wait_until:
-        condition:
-          - media_player.is_announcing:
-        timeout: 0.5s
-    # Restart only mWW if enabled; streaming wake words automatically restart
-    - if:
-        condition:
-          - lambda: |-
-              return id(wake_word_engine_location).current_option() == "On device";
-        then:
-          - wait_until:
-              - and:
-                  - not:
-                      voice_assistant.is_running:
-          - lambda: id(va).set_use_wake_word(false);
-          - micro_wake_word.start:
-          - lambda: |-
-              id(page) = 1;
-  on_stt_vad_end: 
-    then:
-        - lambda: |-
-            id(page) = 1;
-  on_client_connected:
-    - delay: 2s  # Give the api server time to settle
-    - script.execute: start_wake_word
-  on_client_disconnected:
-    - script.execute: stop_wake_word
-  on_timer_finished:
-    - script.execute: stop_wake_word
-    - wait_until:
-        not:
-          microphone.is_capturing:
-script: 
-  - id: start_wake_word
-    then:
-      - if:
-          condition:
-            and:
-              - not:
-                  - voice_assistant.is_running:
-              - lambda: |-
-                  return id(wake_word_engine_location).current_option() == "On device";
-          then:
-            - lambda: id(va).set_use_wake_word(false);
-            - micro_wake_word.start:
-      - if:
-          condition:
-            and:
-              - not:
-                  - voice_assistant.is_running:
-              - lambda: |-
-                  return id(wake_word_engine_location).current_option() == "In Home Assistant";
-          then:
-            - lambda: id(va).set_use_wake_word(true);
-            - voice_assistant.start_continuous:
-  - id: stop_wake_word
-    then:
-      - if:
-          condition:
-            lambda: |-
-                  return id(wake_word_engine_location).current_option() == "In Home Assistant";
-          then:
-            - lambda: id(va).set_use_wake_word(false);
-            - voice_assistant.stop:
-      - if:
-          condition:
-            lambda: |-
-              return id(wake_word_engine_location).current_option() == "On device";
-          then:
-            - micro_wake_word.stop:
-
-micro_wake_word:
-  on_wake_word_detected:
-    - voice_assistant.start:
-        wake_word: !lambda return wake_word;
-  vad:
-  models:
-    - model: hey_jarvis
 
 display:
   - id: !extend led_display
@@ -388,19 +337,3 @@ display:
 
         clock_should_blink = !clock_should_blink;
         it.intensity(id(brightness));
-
-#number:
-#  - platform: template
-#    name: "Clock Brightness Override"
-#    id: clock_brightness_override
-#    internal: false
-#    max_value: 15.0
-#    min_value: 0.0
-#    step: 1
-#    optimistic: true
-#    mode: slider
-#    on_value:
-#      then:
-#        - globals.set: 
-#            id: brightness
-#            value : !lambda "return x;"
