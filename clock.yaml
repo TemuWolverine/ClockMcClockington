@@ -45,7 +45,7 @@ packages:
       - devices/i2s/INMP441.yaml
       - devices/i2s/MAX98357.yaml
       - devices/display/max7219.yaml
-      - devices/voiceassistant.yaml
+      #- devices/voiceassistant.yaml
 
   clockmcclockington:
     url: https://github.com/TemuWolverine/ClockMcClockington
