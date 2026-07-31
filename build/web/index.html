@@ -4,11 +4,9 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>ClockMcClockington | Open Source ESP32 Clock</title>
-    <!-- Tailwind CSS -->
+    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <!-- Material Symbols -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
     <script id="tailwind-config">
@@ -155,6 +153,8 @@
         grid-template-columns: repeat(12, 1fr);
         gap: 24px;
       }
+
+      button { padding: 10px !important; }
     </style>
   </head>
   <body class="font-body-md text-body-md">
@@ -165,17 +165,7 @@
         <span class="font-headline-sm text-headline-sm font-bold text-primary">ClockMcClockington</span>
       </div>
       <div class="hidden md:flex gap-8 items-center">
-        <a class="text-primary font-bold border-b-2 border-primary py-1 hover:bg-primary hover:text-on-primary transition-colors duration-200" href="#">Hardware</a>
-        <a class="text-secondary dark:text-secondary-fixed-dim py-1 hover:bg-primary hover:text-on-primary transition-colors duration-200" href="#">Firmware</a>
-        <a class="text-secondary dark:text-secondary-fixed-dim py-1 hover:bg-primary hover:text-on-primary transition-colors duration-200" href="#">Docs</a>
-        <div class="flex gap-4 ml-4">
-          <button class="active:scale-95 transition-transform">
-            <span class="material-symbols-outlined text-primary">settings_input_component</span>
-          </button>
-          <button class="active:scale-95 transition-transform">
-            <span class="material-symbols-outlined text-primary">terminal</span>
-          </button>
-        </div>
+        <a class="text-secondary dark:text-secondary-fixed-dim py-1 hover:bg-primary hover:text-on-primary transition-colors duration-200" href="https://github.com/TemuWolverine/ClockMcClockington">Github</a>
       </div>
     </nav>
     <main class="max-w-container-max mx-auto px-margin-desktop py-16">
@@ -183,18 +173,20 @@
       <section class="mb-16">
         <div class="bento-grid">
           <div class="col-span-12 lg:col-span-7 flex flex-col justify-center bg-surface-container-low p-12 technical-border">
-            <h1 class="font-headline-lg text-headline-lg mb-6 uppercase tracking-tight">Clock McClockington</h1>
+            <h1 class="font-headline-lg text-headline-lg mb-6 tracking-tight">Clock McClockington</h1>
             <h3 class="font-headline-sm text-headline-sm text-secondary mb-4 uppercase">Open Source ESP32 Clock</h3>
             <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mb-10"> A reliable, open-source clock powered by ESP32. Designed for simplicity, accuracy, and ease of use. This project provides the firmware and documentation needed to build or update your device. </p>
             <!-- WebSerial Status Bar / Flash Action -->
-            <div class="technical-border bg-white p-8" id="flash-container">
               <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div class="flex flex-col items-end">
-                  <button class="bg-primary text-on-primary flex items-center gap-3 px-8 py-4 font-label-caps hover:bg-white hover:text-primary technical-border transition-all duration-200 group" id="flash-btn">
-                    <span class="material-symbols-outlined">bolt</span> FLASH VIA WEBSERIAL </button>
+                  <esp-web-install-button manifest="firmware/clockmcclockington.manifest.json">
+                <button slot="activate" class="bg-primary-container text-on-primary-container px-lg py-md rounded-xl font-bold text-lg hover:brightness-105 active:scale-[0.98] transition-all flex items-center gap-sm shadow-sm ring-1 ring-primary/20">
+                  <span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1">bolt</span> Flash ClockMcClockington </button>
+                <span slot="unsupported">Ah snap, your browser doesn't work!</span>
+                <span slot="not-allowed">Ah snap, you are not allowed to use this on HTTP!</span>
+              </esp-web-install-button>
                 </div>
               </div>
-            </div>
           </div>
           <div class="col-span-12 lg:col-span-5 technical-border bg-surface-container overflow-hidden relative min-h-[400px]">
             <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"></div>
@@ -206,8 +198,8 @@
                 </div>
               </div>
               <div class="mt-8">
-                <span class="font-label-caps text-label-caps mb-4 block border-b border-primary pb-2">DEVICE METRICS</span>
-                <div class="space-y-2">
+                <span class="font-label-caps text-label-caps mb-4 block border-b border-primary pb-2">DEVICE INFO</span>
+                <!-- <div class="space-y-2">
                   <div class="flex justify-between">
                     <span class="font-label-code text-label-code text-secondary">ARCH</span>
                     <span class="font-label-code text-label-code">ESP32-WROOM-32</span>
@@ -220,7 +212,7 @@
                     <span class="font-label-code text-label-code text-secondary">CORE</span>
                     <span class="font-label-code text-label-code">RTOS COMPLIANT</span>
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -237,12 +229,9 @@
             <span class="material-symbols-outlined text-4xl mb-6">memory</span>
             <h3 class="font-label-caps text-label-caps mb-4">ESP32 BASED</h3>
             <ul class="font-body-sm text-body-sm text-on-surface-variant space-y-3">
-              <li class="flex items-start gap-2">
+              <!-- <li class="flex items-start gap-2">
                 <span class="text-primary font-bold">/</span> Integrated Wi-Fi and Bluetooth connectivity for network time synchronization.
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="text-primary font-bold">/</span> Dual-core processing ensures high timing precision without interface lag.
-              </li>
+              </li> -->
             </ul>
           </div>
           <div class="p-8 technical-border bg-surface hover:bg-surface-container transition-colors">
@@ -264,9 +253,6 @@
               <li class="flex items-start gap-2">
                 <span class="text-primary font-bold">/</span> Firmware and hardware documentation licensed under permissive terms.
               </li>
-              <li class="flex items-start gap-2">
-                <span class="text-primary font-bold">/</span> Comprehensive build guide for technical reproduction.
-              </li>
             </ul>
           </div>
         </div>
@@ -276,8 +262,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
           <div class="technical-border-light p-10 flex flex-col justify-between">
             <div>
-              <h4 class="font-headline-sm text-headline-sm mb-4">Firmware v1.2.0</h4>
-              <p class="font-body-md text-body-md text-on-surface-variant mb-8"> Stable release optimized for ESP32 DevKit V1. Includes NTP retry logic and timezone offset configuration via serial console. </p>
+              <h4 class="font-headline-sm text-headline-sm mb-4">Firmware vBloopBleep</h4>
+              <p class="font-body-md text-body-md text-on-surface-variant mb-8"> Some notes</p>
             </div>
             <div class="flex gap-4">
               <button class="technical-border px-6 py-2 font-label-caps hover:bg-primary hover:text-on-primary transition-all">Download .bin</button>
@@ -300,13 +286,11 @@
     <!-- Footer -->
     <footer class="w-full mt-64 border-t-2 border-primary bg-surface-container flex flex-col md:flex-row justify-between items-center px-margin-desktop py-12 max-w-container-max mx-auto">
       <div class="flex flex-col items-start mb-8 md:mb-0">
-        <span class="font-label-caps text-label-caps text-primary mb-4">ClockMcClockington</span>
-        <p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 ClockMcClockington Open Source Project</p>
+        <span class="font-label-caps text-label-caps text-primary mb-4">Clock McClockington</span>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">© 2026 Temu Wolverine</p>
       </div>
       <div class="flex flex-wrap gap-8 justify-center md:justify-end">
         <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">GitHub Repository</a>
-        <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Documentation</a>
-        <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Hardware Schematic</a>
         <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">License</a>
       </div>
     </footer>
