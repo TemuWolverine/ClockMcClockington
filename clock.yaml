@@ -290,14 +290,14 @@ media_player:
       - id: timer_finished_wave_file
         file: https://github.com/esphome/wake-word-voice-assistants/raw/main/sounds/timer_finished.wav
 
-    on_announcement:
-      - if:
-          condition:
-            - microphone.is_capturing:
-          then:
-            - script.execute: stop_wake_word
-    on_idle:
-      - script.execute: start_wake_word
+#    on_announcement:
+#      - if:
+#          condition:
+#            - microphone.is_capturing:
+#          then:
+#            - script.execute: stop_wake_word
+#    on_idle:
+#      - script.execute: start_wake_word
 
 display:
   - id: !extend led_display
