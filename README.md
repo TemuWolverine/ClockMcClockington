@@ -6,14 +6,16 @@ I’m no fan of voice assistance, so the microphone has been off, meaning they d
 Since all of the smarts in my house run off Home Assistant (HA), I want this clock to be able to interact with HA. Specifically, I want some buttons that can then trigger other things in the house, such as “shut down all the lights”, or “volume up/down” for the bedroom Sonos speakers. That way I don’t need to have my phone on.
 
 ## Hardware
-* WeMos S2 Mini (ESP32-S2)
-* MAX7219 8x32 Dot LED Matrix 
-* (4) TPP223 touch sensor
+* [ESP32-S3 Nano](https://s.click.aliexpress.com/e/_c4kUQqIB)
+* [MAX7219 8x32 Dot LED Matrix](https://s.click.aliexpress.com/e/_c3OT7z6F)
+* [(4) 5mm Tactile switches](https://s.click.aliexpress.com/e/_c4DqcA55)
+* [GL5516 LDR Photoresistor](https://s.click.aliexpress.com/e/_c41f2RgX)
+* [INMP441 Microphone](https://www.aliexpress.com/item/1005006090551057.html)
+* [MAX98357a amplifier](https://www.aliexpress.com/item/1005006090551057.html)
+* (2) 0.1uf ceramic capacitor (for decoupling)
 * 10k ohm resistor
-* GL5516 LDR Photoresistor
 * ClockMcClockington PCB
 
-Originally I'd intended to make use of the ESP32-S2's touchpins, but they were... fiddly at best, and didn't really work well through the 3d printed shell, so I switched to using the TPP223 sensors. Everything *could* run off an ESP8266 just fine, but I'd already purchased the bulk pack of S2 Minis, so I've stuck with that. There isn't a huge price or power difference for this sort of thing.
 
 ## Software
 TODO: 
@@ -24,9 +26,4 @@ ESPHome
 TODO: 
 
 ## Circuit
-v1.0 This is my very first circuit design, so go easy on me!
-While it is completely functional, I didn't think to design it on a 2.54mm grid so soldering it using a breadboard to hold the pins is a little tricky. That will be an improvement for v1.1
-![](https://github.com/user-attachments/assets/5c6d79e1-64d2-4a91-ad7c-7b759cf98402)
 
-Manufactured by JLCPCB.
-![](https://github.com/user-attachments/assets/266d4dd0-680c-46d8-819b-79539a51083d)
