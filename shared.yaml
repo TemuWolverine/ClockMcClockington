@@ -7,10 +7,12 @@ labels: [clock, led matrix, esp32, ws2815]
 ---
 #Fonts
 font:
+    # https://github.com/IT-Studio-Rech/bdf-fonts/blob/main/5x7.bdf
   - file: "fonts/5x7.bdf"
     id: DayFont
     glyphs:  |-
       -ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567980°na?elo
+    # https://github.com/trip5/Matrix-Fonts
   - file: "fonts/MatrixLight8X.bdf"
     id: TimeFont
     glyphs:  |-
