@@ -33,4 +33,4 @@ ota:
 update:
   - platform: http_request
     name: Firmware
-    source: https://esphome.github.io/esphome-project-template/firmware/project-template.manifest.json
+    source: https://temuwolverine.github.io/ClockMcClockington/firmware/clockmcclockington.manifest.json
