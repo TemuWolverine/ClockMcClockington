@@ -43,7 +43,6 @@ packages:
     ref: main
     refresh: 1s
     files:
-      - esphome_boilerplate.yaml
       - boards/esp32_s3_nano.yaml
       - devices/i2s/INMP441.yaml
       - devices/i2s/MAX98357.yaml
