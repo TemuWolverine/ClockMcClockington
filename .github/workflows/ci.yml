@@ -20,7 +20,7 @@ jobs:
       max-parallel: 3
       matrix:
         file:
-          - build/project-template-esp32-s3
+          - clock
 
         esphome-version:
           - stable
