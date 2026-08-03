@@ -1,9 +1,10 @@
-author: Paul Jenkins
-name: ClockMcClockington
-version: 0.1
-source: https://github.com/TemuWolverine/ClockMcClockington
-labels: [clock, led matrix, esp32]
----
+# ESPHome "Take Control" does not like yaml frontmatter.
+# author: Paul Jenkins
+# name: ClockMcClockington
+# version: 0.1
+# source: https://github.com/TemuWolverine/ClockMcClockington
+# labels: [clock, led matrix, esp32]
+# ---
 
 substitutions:
   friendly_name: Clock McClockington
@@ -42,10 +43,11 @@ packages:
     ref: main
     refresh: 1s
     files:
+      - esphome_boilerplate.yaml
+      - boards/esp32_s3_nano.yaml
       - devices/i2s/INMP441.yaml
       - devices/i2s/MAX98357.yaml
       - devices/display/max7219.yaml
-      #- devices/voiceassistant.yaml
 
   clockmcclockington:
     url: https://github.com/TemuWolverine/ClockMcClockington
@@ -116,8 +118,8 @@ number:
     id: ldr_brightness_dark
     min_value: 0
     max_value: 15
+    lambda: 'return (float) id(brightness_dark_cfg);'
     step: 1
-    optimistic: true
     set_action:
       - globals.set:
           id: brightness_dark_cfg
@@ -129,7 +131,7 @@ number:
     min_value: 0
     max_value: 15
     step: 1
-    optimistic: true
+    lambda: 'return (float) id(brightness_dim_cfg);'
     set_action:
       - globals.set:
           id: brightness_dim_cfg
@@ -141,7 +143,7 @@ number:
     min_value: 0
     max_value: 15
     step: 1
-    optimistic: true
+    lambda: 'return (float) id(brightness_mid_cfg);'
     set_action:
       - globals.set:
           id: brightness_mid_cfg
@@ -153,7 +155,7 @@ number:
     min_value: 0
     max_value: 15
     step: 1
-    optimistic: true
+    lambda: 'return (float) id(brightness_bright_cfg);'
     set_action:
       - globals.set:
           id: brightness_bright_cfg

@@ -1,10 +1,10 @@
-author: Paul Jenkins
-name: ClockMcClockington-shared
-description: used by both the Nano and Senior versions of the clock to define some shared components
-version: 0.1
-source: https://github.com/TemuWolverine/ClockMcClockington
-labels: [clock, led matrix, esp32, ws2815]
----
+# author: Paul Jenkins
+# name: ClockMcClockington-shared
+# description: used by both the Nano and Senior versions of the clock to define some shared components
+# version: 0.1
+# source: https://github.com/TemuWolverine/ClockMcClockington
+# labels: [clock, led matrix, esp32, ws2815]
+# ---
 #Fonts
 font:
     # https://github.com/IT-Studio-Rech/bdf-fonts/blob/main/5x7.bdf
