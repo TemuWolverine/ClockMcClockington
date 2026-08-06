@@ -38,7 +38,7 @@ Alternatively, you can edit the YAML, change `weatherSensor : sensor.clock_temp`
 The way ESPHome exposes hardware buttons to Home Assistant is a bit funky (or I'm an idiot and have done it wrong) - they're exposed as generic events rather than 'click'.
 
 ClockMcClockington sends out `esphome.<name>.clock_button_pressed`, where name will start with 'clockmcclockington' plus the MAC of the device. The event data will be one, two, three or four. Currently long press and double click are not implemented. 
-```
+```yaml
 alias: btnOne
 description: ""
 triggers:
