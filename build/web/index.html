@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <link href="prism.css" rel="stylesheet" />
     <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -159,10 +160,8 @@
   </head>
   <body class="font-body-md text-body-md">
     <!-- TopNavBar -->
-    <nav class="w-full top-0 border-b-2 border-primary bg-surface flex justify-between items-center px-margin-desktop py-4 max-w-container-max mx-auto">
+    <nav class="w-full top-0  bg-surface flex justify-between items-center px-margin-desktop py-4 max-w-container-max mx-auto">
       <div class="flex items-center gap-4">
-        <img alt="ClockMcClockington Logo" class="h-10 w-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPHaIlZIR1yFbw_1E43sPqQxHWo4m6pMeM_TEJ0OT8IJDt5wCtU4n-Fa-Xnl3qDQnIFWVxVpFP1Trm9LPVgN0PCsd4v7E8sm7DSMbnKrBXzY_56X7gvdstJl-ILyaUTUtmB3CrSzw3m0XwuboIq0ZD8yeOVa63XnwsIdWK3oFBgkQX3LLwSFg95X9U1-dNt1zg-tKH9tvKTq3_iS4JILCOOHEs4vGNr93WynHzC92WP5nVbzMnzBJus-kjsDjC4ubk4hM">
-        <span class="font-headline-sm text-headline-sm font-bold text-primary">ClockMcClockington</span>
       </div>
       <div class="hidden md:flex gap-8 items-center">
         <a class="text-secondary dark:text-secondary-fixed-dim py-1 hover:bg-primary hover:text-on-primary transition-colors duration-200" href="https://github.com/TemuWolverine/ClockMcClockington">Github</a>
@@ -173,9 +172,9 @@
       <section class="mb-16">
         <div class="bento-grid">
           <div class="col-span-12 lg:col-span-7 flex flex-col justify-center bg-surface-container-low p-12 technical-border">
-            <h1 class="font-headline-lg text-headline-lg mb-6 tracking-tight">Clock McClockington</h1>
+            <img alt="ClockMcClockington Logo" class="h-100 w-100" src="logo.png">
             <h3 class="font-headline-sm text-headline-sm text-secondary mb-4 uppercase">Open Source ESP32 Clock</h3>
-            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mb-10"> A reliable, open-source clock powered by ESP32. Designed for simplicity, accuracy, and ease of use. This project provides the firmware and documentation needed to build or update your device. </p>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mb-10"> A reliable, open-source clock powered by ESP32, ESPHome and Home Assistant. 4 buttons to trigger Home Assistant automations, talk to it for some reason and it'll talk back.<br /><br /> This project provides the firmware and documentation needed to build or update your device. </p>
             <!-- WebSerial Status Bar / Flash Action -->
               <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div class="flex flex-col items-end">
@@ -194,6 +193,12 @@
               <div class="flex flex-col gap-1">
                 <span class="font-label-caps text-label-caps opacity-60">PROJECT PHOTO</span>
                 <div class="technical-border p-1 bg-white">
+                  <img alt="ClockMcClockington Project Photo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY2k8opwI6_xTqzeHbbqet6aORqOMYzVYTOfFwrmOTjSuTJKLrz96tYci-tTCQC-iSNzZRA4tJFHyliuIVC7S7pM-ouiBZ3ee_cbpfF_mlbQaqiSUB_hEjwMnaVRnblchWlHcFXcnq4y9NQ3IZNPlAYnJ8m3VZdY853qvk1OycCndSEsxf29IB0Xk3aZizB6tkR07gL-60YhIChzU16tNur8qfXW7GGJZyi3O1Arv_MtILxw5dOsYo4NXA-zvSGdZ-8QE">
+                </div>
+                                <div class="technical-border p-1 bg-white">
+                  <img alt="ClockMcClockington Project Photo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY2k8opwI6_xTqzeHbbqet6aORqOMYzVYTOfFwrmOTjSuTJKLrz96tYci-tTCQC-iSNzZRA4tJFHyliuIVC7S7pM-ouiBZ3ee_cbpfF_mlbQaqiSUB_hEjwMnaVRnblchWlHcFXcnq4y9NQ3IZNPlAYnJ8m3VZdY853qvk1OycCndSEsxf29IB0Xk3aZizB6tkR07gL-60YhIChzU16tNur8qfXW7GGJZyi3O1Arv_MtILxw5dOsYo4NXA-zvSGdZ-8QE">
+                </div>
+                                <div class="technical-border p-1 bg-white">
                   <img alt="ClockMcClockington Project Photo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY2k8opwI6_xTqzeHbbqet6aORqOMYzVYTOfFwrmOTjSuTJKLrz96tYci-tTCQC-iSNzZRA4tJFHyliuIVC7S7pM-ouiBZ3ee_cbpfF_mlbQaqiSUB_hEjwMnaVRnblchWlHcFXcnq4y9NQ3IZNPlAYnJ8m3VZdY853qvk1OycCndSEsxf29IB0Xk3aZizB6tkR07gL-60YhIChzU16tNur8qfXW7GGJZyi3O1Arv_MtILxw5dOsYo4NXA-zvSGdZ-8QE">
                 </div>
               </div>
@@ -221,41 +226,60 @@
       <!-- Technical Facts Section -->
       <section class="mt-32">
         <div class="flex items-center gap-6 mb-12">
-          <h2 class="font-headline-md text-headline-md uppercase">Technical Specifications</h2>
+          <h2 class="font-headline-md text-headline-md uppercase">Setup</h2>
           <div class="flex-grow h-0.5 bg-primary opacity-10"></div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-          <div class="p-8 technical-border bg-surface hover:bg-surface-container transition-colors">
-            <span class="material-symbols-outlined text-4xl mb-6">memory</span>
-            <h3 class="font-label-caps text-label-caps mb-4">ESP32 BASED</h3>
-            <ul class="font-body-sm text-body-sm text-on-surface-variant space-y-3">
-              <!-- <li class="flex items-start gap-2">
-                <span class="text-primary font-bold">/</span> Integrated Wi-Fi and Bluetooth connectivity for network time synchronization.
-              </li> -->
-            </ul>
-          </div>
-          <div class="p-8 technical-border bg-surface hover:bg-surface-container transition-colors">
-            <span class="material-symbols-outlined text-4xl mb-6">upload_file</span>
-            <h3 class="font-label-caps text-label-caps mb-4">WEBSERIAL FLASHING</h3>
-            <ul class="font-body-sm text-body-sm text-on-surface-variant space-y-3">
-              <li class="flex items-start gap-2">
-                Using Chrome, Edge or Firefox, you can flash the firmware directly to the ESP32 without needing any additional software.
-              </li>
-            </ul>
-          </div>
-          <div class="p-8 technical-border bg-surface hover:bg-surface-container transition-colors">
-            <span class="material-symbols-outlined text-4xl mb-6">code</span>
-            <h3 class="font-label-caps text-label-caps mb-4">OPEN SOURCE</h3>
-            <ul class="font-body-sm text-body-sm text-on-surface-variant space-y-3">
-              <li class="flex items-start gap-2">
-                <span class="text-primary font-bold">/</span> MIT license for firmware and hardware. Neat!
-              </li>
-            </ul>
+        <div class="flex items-center gap-6 mb-12r">
+          <div class="p-8 bg-surface">
+            <h2 class="font-headline-sm text-headline-sm uppercase">Device Configuration</h2>
+            The temperature information is fetched from Home Assistant. You'll need to have the sensor preconfigured. <br/>
+            <strong>If you use the flashing tool above</strong><br />
+            <ol class="list-decimal">
+              <li>Setup a template sensor</li>
+            </ol>
+            <br /><br />
+            <strong>If you're installing from YAML</strong><br />
+
+                In the substitutions section, near the top of the clock.yaml file, find "weatherSensor" <code  class="language-yaml">weatherSensor : sensor.clock_temp</code>. <br />
+                Change that to your sensor <code  class="language-yaml">weatherSensor : sensor.my_super_local_sensor</code> <br />
+                <br />
+                Then compile and install on your ESP32
+
+            <br />
+            <h2 class="font-headline-sm text-headline-sm uppercase">Button Automations</h2>
+            The way ESPHome exposes hardware buttons to Home Assistant is a bit funky (or I'm an idiot and have done it wrong).
+            <br /><br />
+
+            <strong>Home Assistant Automations</strong><br />
+            <pre><code class="language-yaml">alias: btnOne
+description: ""
+triggers:
+  - trigger: event
+    event_data:
+      button: one
+    event_type: esphome.clockmcclockingtonred.clock_button_pressed
+conditions: []
+actions:
+  - action: light.toggle
+    metadata: {}
+    target:
+      area_id: study
+    data: {}
+mode: single
+            </code></pre>
+            <br /><br />
+            <strong>Node-Red</strong>
+            <img src="images/nodered.png" /> <br />
+            The switch evaluates <code  class="language-js">msg.payload.event.button</code>, with the possible options being "one", "two", "three", and "four" (from left to right on the clock). You can then trigger whatever you want from there. <br />
           </div>
         </div>
       </section>
       <!-- Documentation/Hardware Grid -->
       <section class="mt-32">
+        <div class="flex items-center gap-6 mb-12">
+          <h2 class="font-headline-md text-headline-md uppercase">Downloads</h2>
+          <div class="flex-grow h-0.5 bg-primary opacity-10"></div>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
           <div class="technical-border-light p-10 flex flex-col justify-between">
             <div>
@@ -263,18 +287,18 @@
               <p class="font-body-md text-body-md text-on-surface-variant mb-8"> Some notes</p>
             </div>
             <div class="flex gap-4">
-              <button class="technical-border px-6 py-2 font-label-caps hover:bg-primary hover:text-on-primary transition-all">Download .bin</button>
-              <button class="technical-border px-6 py-2 font-label-caps hover:bg-primary hover:text-on-primary transition-all">Changelog</button>
+              <a href="https://github.com/TemuWolverine/ClockMcClockington/releases/latest" class="text-inherit no-underline"><button class="technical-border px-6 py-2 font-label-caps hover:bg-primary hover:text-on-primary transition-all">Changelog</button></a>
             </div>
           </div>
           <div class="technical-border-light p-10 flex flex-col justify-between">
             <div>
-              <h4 class="font-headline-sm text-headline-sm mb-4">Wiring Diagram</h4>
-              <p class="font-body-md text-body-md text-on-surface-variant mb-8"> Reference connections for I2C OLED displays and real-time clock (RTC) modules. </p>
+              <h4 class="font-headline-sm text-headline-sm mb-4">Wiring</h4>
             </div>
             <div class="flex gap-4">
-              <button class="technical-border px-6 py-2 font-label-caps hover:bg-primary hover:text-on-primary transition-all">Open PDF</button>
-              <button class="technical-border px-6 py-2 font-label-caps hover:bg-primary hover:text-on-primary transition-all">BOM List</button>
+              <a href="plots/Clock.pdf"><button class="technical-border px-6 py-2 font-label-caps hover:bg-primary hover:text-on-primary transition-all">Circuit Diagram</button></a>
+              <button disabled class="technical-border px-6 py-2 font-label-caps">Wiring Diagram</button>
+              <a href="https://github.com/TemuWolverine/ClockMcClockington/blob/main/README.md#bom"><button class="technical-border px-6 py-2 font-label-caps hover:bg-primary hover:text-on-primary transition-all">BOM List</button></a>
+            </div>
             </div>
           </div>
         </div>
@@ -287,9 +311,10 @@
         <p class="font-body-sm text-body-sm text-on-surface-variant">© 2026 Temu Wolverine</p>
       </div>
       <div class="flex flex-wrap gap-8 justify-center md:justify-end">
-        <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">GitHub Repository</a>
-        <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">License</a>
+        <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="https://github.com/TemuWolverine/ClockMcClockington" target="_blank">GitHub</a>
+        <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="https://github.com/TemuWolverine/ClockMcClockington/blob/main/LICENSE" target="_blank">License</a>
       </div>
     </footer>
+    <script src="prism.js"></script>
   </body>
 </html>

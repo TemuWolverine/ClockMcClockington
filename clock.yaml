@@ -7,9 +7,9 @@
 # ---
 
 substitutions:
-  friendly_name: Clock McClockington
+  friendly_name: ClockMcClockington
   device_name: clockmcclockington
-  weatherSensor : sensor.imelbo1140_temperature
+  weatherSensor : sensor.clock_temp
 
   #Sound pins (I2S)
   speaker_i2s_lrclk_pin: GPIO45 #WS
@@ -43,6 +43,7 @@ packages:
     ref: main
     refresh: 1s
     files:
+      - esphome_boilerplate.yaml
       - boards/esp32_s3_nano.yaml
       - devices/i2s/INMP441.yaml
       - devices/i2s/MAX98357.yaml
@@ -53,38 +54,10 @@ packages:
     ref: main
     files:
       - shared.yaml
-esphome:
-  name: ${device_name}
-  friendly_name: ${friendly_name}
-  name_add_mac_suffix: true
 
-
-esp32:
-  variant: ESP32S3
-  framework:
-    type: esp-idf
-
-psram:
-  mode: octal
-
-# To be able to get logs from the device via serial and api.
-logger:
-
-# API is a requirement of the dashboard import.
-api:
-
-# OTA is required for Over-the-Air updating
-ota:
-  - platform: esphome
-
-wifi:
-  # Set up a wifi access point using the device name above
-  ap:
-
-# In combination with the `ap` this allows the user
-# to provision wifi credentials to the device.
-captive_portal:
-
+web_server:
+  version: 3
+  
 #global config
 globals:
   - id: startup_complete
@@ -159,6 +132,7 @@ number:
       - globals.set:
           id: brightness_bright_cfg
           value: !lambda 'return (int) x;'
+
 
 binary_sensor:
   - platform: gpio
@@ -291,14 +265,143 @@ media_player:
       - id: timer_finished_wave_file
         file: https://github.com/esphome/wake-word-voice-assistants/raw/main/sounds/timer_finished.wav
 
-#    on_announcement:
-#      - if:
-#          condition:
-#            - microphone.is_capturing:
-#          then:
-#            - script.execute: stop_wake_word
-#    on_idle:
-#      - script.execute: start_wake_word
+    on_announcement:
+      - if:
+          condition:
+            - microphone.is_capturing:
+          then:
+            - script.execute: stop_wake_word
+    on_idle:
+      - script.execute: start_wake_word
+
+## VOICE ASSIST STUFF 
+select:
+  - platform: template
+    entity_category: config
+    name: Wake word engine location
+    id: wake_word_engine_location
+    optimistic: true
+    restore_value: true
+    options:
+      - In Home Assistant
+      - On device
+    initial_option: On device
+    on_value:
+      - if:
+          condition:
+            lambda: return x == "In Home Assistant";
+          then:
+            - micro_wake_word.stop:
+            - delay: 500ms
+            - lambda: id(va).set_use_wake_word(true);
+            - voice_assistant.start_continuous:
+      - if:
+          condition:
+            lambda: return x == "On device";
+          then:
+            - lambda: id(va).set_use_wake_word(false);
+            - voice_assistant.stop:
+            - delay: 500ms
+            - micro_wake_word.start:
+              
+voice_assistant:
+  id: va
+  micro_wake_word:
+  microphone:
+    microphone: i2s_microphone
+    channels: 0
+    gain_factor: 4
+  media_player: ${mediaplayer}
+  noise_suppression_level: 2
+  auto_gain: 31dBFS
+  on_listening: 
+    then:
+        - lambda: |-
+            id(page) = 3;
+  on_idle: 
+    then:
+        - lambda: |-
+            id(page) = 1;
+  on_end:
+    # Handle the "nevermind" case where there is no announcement
+    - wait_until:
+        condition:
+          - media_player.is_announcing:
+        timeout: 0.5s
+    # Restart only mWW if enabled; streaming wake words automatically restart
+    - if:
+        condition:
+          - lambda: |-
+              return id(wake_word_engine_location).current_option() == "On device";
+        then:
+          - wait_until:
+              - and:
+                  - not:
+                      voice_assistant.is_running:
+          - lambda: id(va).set_use_wake_word(false);
+          - micro_wake_word.start:
+          - lambda: |-
+              id(page) = 1;
+  on_stt_vad_end: 
+    then:
+        - lambda: |-
+            id(page) = 1;
+  on_client_connected:
+    - delay: 2s  # Give the api server time to settle
+    - script.execute: start_wake_word
+  on_client_disconnected:
+    - script.execute: stop_wake_word
+  on_timer_finished:
+    - script.execute: stop_wake_word
+    - wait_until:
+        not:
+          microphone.is_capturing:
+script: 
+  - id: start_wake_word
+    then:
+      - if:
+          condition:
+            and:
+              - not:
+                  - voice_assistant.is_running:
+              - lambda: |-
+                  return id(wake_word_engine_location).current_option() == "On device";
+          then:
+            - lambda: id(va).set_use_wake_word(false);
+            - micro_wake_word.start:
+      - if:
+          condition:
+            and:
+              - not:
+                  - voice_assistant.is_running:
+              - lambda: |-
+                  return id(wake_word_engine_location).current_option() == "In Home Assistant";
+          then:
+            - lambda: id(va).set_use_wake_word(true);
+            - voice_assistant.start_continuous:
+  - id: stop_wake_word
+    then:
+      - if:
+          condition:
+            lambda: |-
+                  return id(wake_word_engine_location).current_option() == "In Home Assistant";
+          then:
+            - lambda: id(va).set_use_wake_word(false);
+            - voice_assistant.stop:
+      - if:
+          condition:
+            lambda: |-
+              return id(wake_word_engine_location).current_option() == "On device";
+          then:
+            - micro_wake_word.stop:
+
+micro_wake_word:
+  on_wake_word_detected:
+    - voice_assistant.start:
+        wake_word: !lambda return wake_word;
+  vad:
+  models:
+    - model: hey_jarvis
 
 display:
   - id: !extend led_display
