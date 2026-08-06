@@ -202,23 +202,7 @@
                   <img alt="ClockMcClockington Project Photo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY2k8opwI6_xTqzeHbbqet6aORqOMYzVYTOfFwrmOTjSuTJKLrz96tYci-tTCQC-iSNzZRA4tJFHyliuIVC7S7pM-ouiBZ3ee_cbpfF_mlbQaqiSUB_hEjwMnaVRnblchWlHcFXcnq4y9NQ3IZNPlAYnJ8m3VZdY853qvk1OycCndSEsxf29IB0Xk3aZizB6tkR07gL-60YhIChzU16tNur8qfXW7GGJZyi3O1Arv_MtILxw5dOsYo4NXA-zvSGdZ-8QE">
                 </div>
               </div>
-              <div class="mt-8">
-                <span class="font-label-caps text-label-caps mb-4 block border-b border-primary pb-2">DEVICE INFO</span>
-                <!-- <div class="space-y-2">
-                  <div class="flex justify-between">
-                    <span class="font-label-code text-label-code text-secondary">ARCH</span>
-                    <span class="font-label-code text-label-code">ESP32-WROOM-32</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="font-label-code text-label-code text-secondary">SYNC</span>
-                    <span class="font-label-code text-label-code">NTP (IEEE 802.11)</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="font-label-code text-label-code text-secondary">CORE</span>
-                    <span class="font-label-code text-label-code">RTOS COMPLIANT</span>
-                  </div>
-                </div> -->
-              </div>
+
             </div>
           </div>
         </div>
@@ -234,8 +218,16 @@
             <h2 class="font-headline-sm text-headline-sm uppercase">Device Configuration</h2>
             The temperature information is fetched from Home Assistant. You'll need to have the sensor preconfigured. <br/>
             <strong>If you use the flashing tool above</strong><br />
+            Setup a template sensor
             <ol class="list-decimal">
-              <li>Setup a template sensor</li>
+              <li>Navigate (in Home Assistant) to Settings > Devices & Services > Helpers</li>
+              <li>Create Helper (bottom right corner) > Template > Sensor </li>
+              <li>Two fields are required, the name and the state. Name must be <strong>clock_temp</strong><br /><br />
+                  Set the state to <code class="language-yaml">{{ states("sensor.myweathersensor_temperature")}}</code><br /><br />
+
+                  The other fields are entirely optional, but can make presentation in HomeAssistant clearer
+                  <img src="images/firefox_DwW2C3pwxb.png" />
+              </li>
             </ol>
             <br /><br />
             <strong>If you're installing from YAML</strong><br />
@@ -245,9 +237,10 @@
                 <br />
                 Then compile and install on your ESP32
 
-            <br />
+            <br /><br />
             <h2 class="font-headline-sm text-headline-sm uppercase">Button Automations</h2>
-            The way ESPHome exposes hardware buttons to Home Assistant is a bit funky (or I'm an idiot and have done it wrong).
+            The way ESPHome exposes hardware buttons to Home Assistant is a bit funky (or I'm an idiot and have done it wrong) - they're exposed as generic events rather than 'click'.<br /><br />
+            ClockMcClockington sends out "esphome.&lt;name&gt;.clock_button_pressed", where name will start with 'clockmcclockington' plus the MAC of the device. The event data will be  one, two, three or four. Currently long press and double click are not implemented.
             <br /><br />
 
             <strong>Home Assistant Automations</strong><br />
