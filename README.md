@@ -19,12 +19,47 @@ Since all of the smarts in my house run off Home Assistant (HA), I want this clo
 | ClockMcClockington PCB | 1 | Optional|
 
 ## Software
-TODO: 
-ESPHome
+The ESPHome configuration is available as the [yaml file](https://github.com/TemuWolverine/ClockMcClockington/blob/main/clock.yaml), or as a [binary you can flash directly from your browser](https://temuwolverine.github.io/ClockMcClockington/)
 
+### Setup
+The temperature information is fetched from Home Assistant. You'll need to have the sensor preconfigured.
+
+* Setup a template sensor
+* Navigate (in Home Assistant) to Settings > Devices & Services > Helpers
+* Create Helper (bottom right corner) > Template > Sensor
+* Two fields are required, the name and the state. Name must be `clock_temp`
+* Set the state to `{{ states("sensor.myweathersensor_temperature")}}`
+  The other fields are entirely optional, but can make presentation in HomeAssistant clearer 
+
+Alternatively, you can edit the YAML, change `weatherSensor : sensor.clock_temp` to `weatherSensor : sensor.sensor.myweathersensor_temperature`
+
+
+### Automations
+The way ESPHome exposes hardware buttons to Home Assistant is a bit funky (or I'm an idiot and have done it wrong) - they're exposed as generic events rather than 'click'.
+
+ClockMcClockington sends out `esphome.<name>.clock_button_pressed`, where name will start with 'clockmcclockington' plus the MAC of the device. The event data will be one, two, three or four. Currently long press and double click are not implemented. 
+```
+alias: btnOne
+description: ""
+triggers:
+  - trigger: event
+    event_data:
+      button: one
+    event_type: esphome.clockmcclockingtonred.clock_button_pressed
+conditions: []
+actions:
+  - action: light.toggle
+    metadata: {}
+    target:
+      area_id: study
+    data: {}
+mode: single
+```
 
 ## Shell
 TODO: 
 
 ## Circuit
+The Kicad project for the circuit design is available under the [/circuit](https://github.com/TemuWolverine/ClockMcClockington/tree/main/circuit) folder
+<img width="1521" height="554" alt="image" src="https://github.com/user-attachments/assets/2ca5430a-0554-4252-a7c4-acba82484d5b" />
 
