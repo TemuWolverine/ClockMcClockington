@@ -57,7 +57,8 @@ jobs:
         uses: actions/configure-pages@v5
         
       - name: Build with Jekyll
-        run: bundle exec jekyll build -s ./build/web -d ./output
+        working-directory: ./build/web
+        run: bundle exec jekyll build -s . -d ../output
         env:
           JEKYLL_ENV: production
       - name: Fetch firmware files
