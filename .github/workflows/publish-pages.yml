@@ -58,7 +58,7 @@ jobs:
         
       - name: Build with Jekyll
         working-directory: ./build/web
-        run: bundle exec jekyll build -s . -d ./output
+        run: bundle exec jekyll build -s . -d ../../output
         env:
           JEKYLL_ENV: production
       - name: Fetch firmware files
