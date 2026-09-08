@@ -1,5 +1,6 @@
 author: Paul Jenkins
 url: https://www.tmwlvrn.com
+baseurl: "ClockMcClockington"
 #logo: /assets/images/home-blog-card.png
 repo: https://github.com/temuwolverine/clockmcclockington
 locale : en_au
