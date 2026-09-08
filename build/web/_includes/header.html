@@ -10,7 +10,9 @@
       <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
       <link href="prism.css" rel="stylesheet" />
 
-      <title>{{ page.title }} | {{ site.title }}</title>
+      <title>
+            {%if page.title %}{{ page.title }} | {% endif %}{{ site.title }}
+      </title>
       {% seo %}
       <style>
       .material-symbols-outlined {
