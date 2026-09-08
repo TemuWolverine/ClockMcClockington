@@ -50,13 +50,14 @@ jobs:
           ruby-version: '3.1' # Not needed with a .ruby-version file
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
+          working-directory: ./build/web
 
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
         
       - name: Build with Jekyll
-        run: bundle exec jekyll build -d ./output
+        run: bundle exec jekyll build -s ./build/web -d ./output
         env:
           JEKYLL_ENV: production
       - name: Fetch firmware files
