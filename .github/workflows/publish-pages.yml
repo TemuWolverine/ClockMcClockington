@@ -54,7 +54,6 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
       - name: Build with Jekyll
-        # Outputs to the './_site' directory by default
         run: bundle exec jekyll build -s ./build/web -d ./output"
         env:
           JEKYLL_ENV: production
@@ -63,8 +62,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh release download --pattern '*' --dir output/firmware
       - name: Upload artifact
-        # Automatically uploads an artifact from the './_site' directory by default
         uses: actions/upload-pages-artifact@v3
+        with:
+          path: output
+          retention-days: 1
 
   # Deployment job
   deploy:
