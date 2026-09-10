@@ -12,7 +12,7 @@ Since all of the smarts in my house run off Home Assistant (HA), I want this clo
 | [5mm Tactile switches](https://s.click.aliexpress.com/e/_c4DqcA55) | 4 | |
 | [GL5516 LDR Photoresistor](https://s.click.aliexpress.com/e/_c41f2RgX) | 1 | |
 | [INMP441 Microphone](https://www.aliexpress.com/item/1005006090551057.html) | 1 | |
-| [MAX98357a amplifier](https://www.aliexpress.com/item/1005006090551057.html) | 1 | |
+| [MAX98357a amplifier](https://www.aliexpress.com/item/1005007003802663.html) | 1 | |
 | Speaker | 1 | |
 |  0.1uf ceramic capacitor | 2| Decoupling, through-hole|
 | 10k ohm resistor | 1 | Through-hole|
